@@ -1,2 +1,7 @@
+self._levels = null
 
-self.menu = "Main"
+def loadLevels(levels) (
+  self.menu = "Main"
+  self._levels @= levels
+  self.level @= levels.all.menu
+)

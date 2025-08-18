@@ -1,4 +1,11 @@
+self.loading = {
+  is: false
+}
+
+def isLoading() (
+  return self.loading.is
+)
 
 def load() (
-    state.loading.is = true
+    self.loading.is = true
 )

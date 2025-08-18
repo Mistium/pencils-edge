@@ -1,9 +1,5 @@
 
 
-def registerPlayer(player) (
-    self._player @= player
-)
-
 def registerLoader(loader) (
     self._loader @= loader
 )
@@ -17,44 +13,87 @@ def registerState(state) (
 )
 
 def pos(x, y) (
-    goto x + cam.x y + cam.y
+    local cam @= self._camera
+    goto x - cam.x y - cam.y
 )
 
 def render() (
     local cam @= self._camera
-    local player @= self._player
-    local menu @= self._state.menu
-    if menu == "Main" (
+    local state @= self._state
+    local menu @= state.menu
+    if menu == "main" (
         cam.goto(0, 0)
-        cam.setZoom(1)
     ) else (
-        cam.changeX(player.x - cam.x / 5)
-        cam.changeY((player.y + 100) - cam.y / 5)
-        cam.changeZoom(((100 - abs(player.getVel()[1] / 1)) - cam.zoom) / 10)
+        cam.x += player.x - cam.x / 5
+        cam.y += (player.y + 100) - cam.y / 5
     )
     pos(player.x, player.y)
-    if menu.contains("Zipline") (
-        local zipline @= self._state.zipline
-        cam.changeZoom(150 - cam.zoom / 5)
-        if menu == "ZiplineMounted" (
-            player.changeVel(zipline.angle.sin() * 10, zipline.angle.cos() * 10)
+    local player_x = x_position
+    local player_y = y_position
+    if menu.contains("zipline") (
+        local zipline @= state.zipline
+        player.direction = 100
+        if menu == "ziplinemounted" (
+            player.changeVel(zipline.angle.sin() * 5, zipline.angle.cos() * 5)
             if "arrowleft".isKeyDown() (
                 player.applyFriction(0.8)
             ) else (
                 player.applyFriction(0.9)
             )
             player.stepPos()
-            player.direction = 100
             if zipline.right < player.x (
-                self._state.menu = "None"
-                self._state.zipline = null
+                state.menu = "none"
+                state.zipline = null
             )
         ) else (
-            player.goto(zipline.x, zipline.y)
-            self._state.menu = "ZiplineMounted"
+            player.goto(zipline.x, zipline.y + 20)
+            state.menu = "ziplinemounted"
         )
     ) else (
         player.movement()
-        image player.findCostume() player.stretch 100
+    )
+    image player.findCostume() player.stretch * 0.8 60
+    
+    local map @= state.level
+    local i = 1
+    loop map.len / 5 (
+      switch map[i] (
+        case "map"
+          pos(map[i + 1], map[i + 2])
+          stretch 300 300
+          image map[i + 3]
+          break
+        case "zipline"
+          pos(map[i + 1], map[i + 3] + 15)
+          stretch 100 100
+          if dist(x_position, y_position, player_x, player_y) < 100 (
+            change_x -43.5
+            image assets.getAssetUrl("zipline", "key")
+            change_x 43.5
+            if "arrowdown".onKeyDown() (
+              state.menu = "zipline"
+              state.zipline = {
+                x: map[i + 1],
+                y: map[i + 3],
+                angle: map[i + 2],
+                right: map[i + 1] + (map[i + 2].sin() * map[i + 4] * 2)
+              }
+            )
+          ) else (
+            image assets.getAssetUrl("zipline", "pole")
+          )
+          local dir = map[i + 2]
+          local dis = map[i + 4]
+          change dir.sin() * dis dir.cos() * dis + 60
+          direction dir
+          stretch dis 100
+          image assets.getAssetUrl("zipline", "line")
+          direction 90
+          change dir.sin() * dis dir.cos() * dis - 60
+          stretch 100 100
+          image assets.getAssetUrl("zipline", "pole")
+          break
+      )
+      i += 5
     )
 )

@@ -4,20 +4,27 @@ loader @= import("./components/loader.osl")
 state @= import("./components/state.osl")
 world @= import("./components/world.osl")
 assets @= import("./components/assets.osl")
+levels @= import("./components/levels.osl")
+
+state.loadLevels(levels)
 
 camera.goto(0, 0)
-player.goto(-400, 100)
+player.goto(-400, 110)
+window.resize(1000, 600)
 
 world.registerPlayer(player)
 world.registerLoader(loader)
 world.registerCamera(camera)
 world.registerState(state)
 
-mainloop:
+window_colour = "#fff"
+window.show()
+window.setDragbox([2,2,0,0],[-2,-2,0,0])
 
+mainloop:
     if loader.isLoading() (
         loader.draw()
     ) else (
-        player.movement()
         world.render()
     )
+    import "win-buttons"

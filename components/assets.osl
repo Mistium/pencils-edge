@@ -2,5 +2,5 @@
 self.url = "https://raw.githubusercontent.com/Mistium/pencils-edge/main/assets/"
 
 def getAssetUrl(type, asset) (
-    return self.url + type + "/" + asset
+    return self.url ++ type ++ "/" ++ asset ++ ".png"
 )

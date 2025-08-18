@@ -4,8 +4,9 @@ self._xv = 0
 self._yv = 0
 self.grounded = true
 self.grounded_time = timer
-self.costume = findCostume()
-
+self.costume = self.findCostume()
+self.stretch = 100
+self.direction = 100
 
 def goto(x, y) (
     self.x = x
@@ -33,45 +34,47 @@ def stepPos() (
 
 def findCostume() (
     local yv = self._yv
-    if yv > 1 (
-        return assets.getAssetUrl("player", "2")
-    )
-    if yv > 3 (
-        return assets.getAssetUrl("player", "3")
-    )
-    if yv > 7 (
-        return assets.getAssetUrl("player", "4")
-    )
-    if yv < -2 (
-        return assets.getAssetUrl("player", "5")
+    if yv < -10 (
+        return assets.getAssetUrl("player", "7")
     )
     if yv < -5 (
         return assets.getAssetUrl("player", "6")
     )
-    if yv < -10 (
-        return assets.getAssetUrl("player", "7")
+    if yv < -2 (
+        return assets.getAssetUrl("player", "5")
+    )
+    if yv > 7 (
+        return assets.getAssetUrl("player", "4")
+    )
+    if yv > 3 (
+        return assets.getAssetUrl("player", "3")
+    )
+    if yv > 1 (
+        return assets.getAssetUrl("player", "2")
     )
     return assets.getAssetUrl("player", "1")
 )
 
 def movement() (
-    self._yv -= 2
+    self._yv -= 1
     if self.grounded (
         self._yv = 0
+        self.last_grounded = timer
     )
     if "arrowleft".isKeyDown() (
-        self._xv -= 7
-        self.direction = 100
+        self._xv -= 3.5
+        self.direction = -100
     )
     if "arrowright".isKeyDown() (
-        self._xv += 7
-        self.direction = 0
+        self._xv += 3.5
+        self.direction = 100
     )
-    if "arrowup".isKeyDown() (
+    if "arrowup".isKeyDown() and timer - self.last_grounded < 0.2 (
         self._yv += 7
+        self.grounded = false
     )
     self.stepPos()
     self._xv *= 0.8
 
-    player.stretch += player.stretch - player.direction / 5
+    player.stretch += player.direction - player.stretch / 5
 )
