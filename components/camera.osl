@@ -1,0 +1,35 @@
+
+self = {
+    x: 0,
+    y: 0
+}
+
+def goto(x, y) (
+    self.x = x
+    self.y = y
+)
+
+def changeX(delta) (
+    self.x += delta
+)
+
+def changeY(delta) (
+    self.y += delta
+)
+
+def change(x, y) (
+    self.x += x
+    self.y += y
+)
+
+def setZoom(level) (
+    self._zoom = level
+)
+
+def changeZoom(delta) (
+    self._zoom += delta
+)
+
+def getZoom() (
+    return self._zoom
+)

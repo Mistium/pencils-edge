@@ -1,0 +1,77 @@
+self.x = 0
+self.y = 0
+self._xv = 0
+self._yv = 0
+self.grounded = true
+self.grounded_time = timer
+self.costume = findCostume()
+
+
+def goto(x, y) (
+    self.x = x
+    self.y = y
+)
+
+def getVel() (
+    return [self._xv, self._yv]
+)
+
+def changeVel(x, y) (
+    self._xv += x
+    self._yv += y
+)
+
+def applyFriction(amt) (
+    self._xv *= amt
+    self._yv *= amt
+)
+
+def stepPos() (
+    self.x += self._xv
+    self.y += self._yv
+)
+
+def findCostume() (
+    local yv = self._yv
+    if yv > 1 (
+        return assets.getAssetUrl("player", "2")
+    )
+    if yv > 3 (
+        return assets.getAssetUrl("player", "3")
+    )
+    if yv > 7 (
+        return assets.getAssetUrl("player", "4")
+    )
+    if yv < -2 (
+        return assets.getAssetUrl("player", "5")
+    )
+    if yv < -5 (
+        return assets.getAssetUrl("player", "6")
+    )
+    if yv < -10 (
+        return assets.getAssetUrl("player", "7")
+    )
+    return assets.getAssetUrl("player", "1")
+)
+
+def movement() (
+    self._yv -= 2
+    if self.grounded (
+        self._yv = 0
+    )
+    if "arrowleft".isKeyDown() (
+        self._xv -= 7
+        self.direction = 100
+    )
+    if "arrowright".isKeyDown() (
+        self._xv += 7
+        self.direction = 0
+    )
+    if "arrowup".isKeyDown() (
+        self._yv += 7
+    )
+    self.stepPos()
+    self._xv *= 0.8
+
+    player.stretch += player.stretch - player.direction / 5
+)

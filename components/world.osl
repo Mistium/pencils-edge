@@ -1,0 +1,60 @@
+
+
+def registerPlayer(player) (
+    self._player @= player
+)
+
+def registerLoader(loader) (
+    self._loader @= loader
+)
+
+def registerCamera(camera) (
+    self._camera @= camera
+)
+
+def registerState(state) (
+    self._state @= state
+)
+
+def pos(x, y) (
+    goto x + cam.x y + cam.y
+)
+
+def render() (
+    local cam @= self._camera
+    local player @= self._player
+    local menu @= self._state.menu
+    if menu == "Main" (
+        cam.goto(0, 0)
+        cam.setZoom(1)
+    ) else (
+        cam.changeX(player.x - cam.x / 5)
+        cam.changeY((player.y + 100) - cam.y / 5)
+        cam.changeZoom(((100 - abs(player.getVel()[1] / 1)) - cam.zoom) / 10)
+    )
+    pos(player.x, player.y)
+    if menu.contains("Zipline") (
+        local zipline @= self._state.zipline
+        cam.changeZoom(150 - cam.zoom / 5)
+        if menu == "ZiplineMounted" (
+            player.changeVel(zipline.angle.sin() * 10, zipline.angle.cos() * 10)
+            if "arrowleft".isKeyDown() (
+                player.applyFriction(0.8)
+            ) else (
+                player.applyFriction(0.9)
+            )
+            player.stepPos()
+            player.direction = 100
+            if zipline.right < player.x (
+                self._state.menu = "None"
+                self._state.zipline = null
+            )
+        ) else (
+            player.goto(zipline.x, zipline.y)
+            self._state.menu = "ZiplineMounted"
+        )
+    ) else (
+        player.movement()
+        image player.findCostume() player.stretch 100
+    )
+)
