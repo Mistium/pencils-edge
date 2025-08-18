@@ -1,6 +1,36 @@
 
 self.url = "https://raw.githubusercontent.com/Mistium/pencils-edge/main/assets/"
 
-def getAssetUrl(type, asset) (
-    return self.url ++ type ++ "/" ++ asset ++ ".png"
+self.all = []
+self.loading = []
+
+def register(type, asset, file_type) (
+  void self.getAssetUrl(type, asset, file_type)
+)
+
+def getAssetUrl(type, asset, file_type) (
+    if file_type == "" (
+      file_type = ".png"
+    )
+    local path = self.url ++ type ++ "/" ++ asset ++ file_type
+    if self.all.contains(path).not() (
+      void self.all.append(path)
+      void self.loading.append(path)
+    )
+    return path
+)
+
+def load() (
+  if self.loading.len > 0 (
+    for i self.loading.len (
+      local cur @= self.loading[i]
+      image cur 0 0
+      if cur.imageinfo("loaded") (
+        void self.loading.delete(i)
+        i --
+      )
+    )
+    import "win-buttons"
+    exit
+  )
 )

@@ -5,10 +5,22 @@ self.loaded @= []
 self.all @= {
   menu: [
     "map",520,-280,assets.getAssetUrl("levels", "menu"),"",
+    "fade",0,-800,6400,400,
+    "collide",-370,50,90,90,
+    "collide",-140,-70,120,90,
+    "collide",810,-430,190,90,
+    "collide",1005,-450,30,90,
+    "collide",1025,-470,30,90,
+    "collide",1250,-490,230,90,
     "zipline",-290,113,130,620,
     "fan",710,-35,-440,""
   ],
   lvl1: [
+    "map",310,-500,assets.getAssetUrl("levels", "lvl1"),"",
+    "fade",0,-1000,6400,400,
+    "collide",-360,50,160,90,
+    "collide",-160,0,30,90,
+    "collide",600,-390,280,90,
     "fan",-180,90,-50,"",
     "flag",700,-340,"",""
   ],

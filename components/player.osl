@@ -1,12 +1,13 @@
 self.x = 0
 self.y = 0
-self._xv = 0
-self._yv = 0
-self.grounded = true
-self.grounded_time = timer
+self.xv = 0
+self.yv = 0
+self.grounded = false
+self.last_grounded = timer
 self.costume = self.findCostume()
 self.stretch = 100
 self.direction = 100
+self.collidedWith = -800
 
 def goto(x, y) (
     self.x = x
@@ -14,26 +15,30 @@ def goto(x, y) (
 )
 
 def getVel() (
-    return [self._xv, self._yv]
+    return [self.xv, self.yv]
 )
 
 def changeVel(x, y) (
-    self._xv += x
-    self._yv += y
+    self.xv += x
+    self.yv += y
 )
 
 def applyFriction(amt) (
-    self._xv *= amt
-    self._yv *= amt
+    self.xv *= amt
+    self.yv *= amt
 )
 
 def stepPos() (
-    self.x += self._xv
-    self.y += self._yv
+    self.x += self.xv
+    self.y += self.yv
+)
+
+def doStretch() (
+    self.stretch += self.direction - self.stretch / 5
 )
 
 def findCostume() (
-    local yv = self._yv
+    local yv = self.yv
     if yv < -10 (
         return assets.getAssetUrl("player", "7")
     )
@@ -56,25 +61,32 @@ def findCostume() (
 )
 
 def movement() (
-    self._yv -= 1
+    self.yv -= 1
     if self.grounded (
-        self._yv = 0
+        self.yv = 0
         self.last_grounded = timer
+    ) else (
+        self.collidedWith = -800
     )
     if "arrowleft".isKeyDown() (
-        self._xv -= 3.5
+        self.xv -= 3
         self.direction = -100
     )
     if "arrowright".isKeyDown() (
-        self._xv += 3.5
+        self.xv += 3
         self.direction = 100
     )
-    if "arrowup".isKeyDown() and timer - self.last_grounded < 0.2 (
-        self._yv += 7
+    if "arrowup".isKeyDown() and self.yv < 9 and timer - self.last_grounded < 0.1 (
+        self.yv += 20
         self.grounded = false
+        self.collidedWith = -800
     )
-    self.stepPos()
-    self._xv *= 0.8
+    self.x += self.xv
+    self.y += self.yv
+    self.xv *= 0.8
+    if self.yv < -15 (
+        self.yv = -15
+    )
 
-    player.stretch += player.direction - player.stretch / 5
+    self.doStretch()
 )

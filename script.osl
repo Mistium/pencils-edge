@@ -5,12 +5,55 @@ state @= import("./components/state.osl")
 world @= import("./components/world.osl")
 assets @= import("./components/assets.osl")
 levels @= import("./components/levels.osl")
+save @= import("./packages/save.osl")
 
 state.loadLevels(levels)
 
-camera.goto(0, 0)
-player.goto(-400, 110)
-window.resize(1000, 600)
+save.init("pencil@mistium")
+data @= save.getItem("data.json")
+if data.exists.not() (
+    save.setItem("data.json", {
+        accessible: 1,
+        speeds: {}
+    })
+    data @= save.getItem("data.json").data
+) else (
+    data @= data.data
+)
+state.speeds @= data.speeds
+state.complete @= data.accessible - 1
+
+assets.register("zipline", "pole")
+assets.register("zipline", "key")
+assets.register("zipline", "line")
+
+assets.register("misc", "lock")
+assets.register("misc", "fade", ".svg")
+assets.register("misc", "flag")
+
+assets.register("levels", "menu")
+for a 1 (
+    assets.register("levels", "lvl" ++ a)
+)
+for b 7 (
+    assets.register("player", b)
+)
+for c 3 (
+    assets.register("fan", c)
+)
+for d 8 (
+    assets.register("selector", d)
+)
+for e 9 (
+    assets.register("text", e)
+)
+
+def reset() (
+    state.gotoLevel("menu")
+    window.resize(1000, 600)
+)
+
+reset()
 
 world.registerPlayer(player)
 world.registerLoader(loader)
@@ -22,9 +65,11 @@ window.show()
 window.setDragbox([2,2,0,0],[-2,-2,0,0])
 
 mainloop:
+    assets.load()
     if loader.isLoading() (
         loader.draw()
     ) else (
         world.render()
     )
+    // log player
     import "win-buttons"

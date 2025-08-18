@@ -1,9 +1,7 @@
 
-self = {
-    x: 0,
-    y: 0,
-    zoom: 1
-}
+self.x = 0
+self.y = 0
+self.zoom = 1
 
 def goto(x, y) (
     self.x = x

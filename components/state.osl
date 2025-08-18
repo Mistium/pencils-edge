@@ -1,7 +1,25 @@
 self._levels = null
+self.timer = false
 
 def loadLevels(levels) (
-  self.menu = "Main"
+  self.menu = "main"
   self._levels @= levels
+  self.levelName = "menu"
   self.level @= levels.all.menu
+)
+
+def gotoLevel(name) (
+  self.menu = "main"
+  if levels.all.contains(name) (
+    self.timer = false
+    camera.goto(0, 0)
+    player.goto(-400, 110)
+    player.xv = 0
+    player.yv = 0
+    self.levelName = name
+    self.level @= levels.all[name]
+    self.levelBoundY = self.level[self.level.index("fade") + 2]
+  ) else (
+    throw "error" "no level with that name"
+  )
 )
