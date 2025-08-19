@@ -1,0 +1,576 @@
+opal_imports = {}
+def import(path) (
+  switch path (
+
+case "./packages/save.osl"
+  class __imports__7828d16f7d3ae9e9fe3a46f36f553e7a (
+    self.saveContents = saveContents
+    
+    def init(directory) (
+      save directory "set_directory"
+    )
+    
+    def setItem(filename, value) (
+      save filename "set" value
+    )
+    
+    def all() (
+      return self.saveContents()
+    )
+    
+    def getItem(filename) (
+      if filename.contains(".").not() (
+        filename.append(".txt")
+      )
+      local exists = filename.saveExists()
+      local data = exists ? filename.saveGet() ""
+      local size = data.len
+      
+      return {
+        filename,
+        exists,
+        data,
+        size
+      }
+    )
+)
+  return __imports__7828d16f7d3ae9e9fe3a46f36f553e7a
+case "./components/levels.osl"
+  class __imports__e24534d84ae77363f7ef6a41e3197c0a (
+    self.loaded @= []
+    
+    self.all @= {
+      menu: [
+        "map",520,-280,assets.getAssetUrl("levels", "menu"),"",
+        "fade",0,-800,6400,400,
+        "collide",-370,50,90,90,
+        "collide",-140,-70,120,90,
+        "collide",810,-430,190,90,
+        "collide",1005,-450,30,90,
+        "collide",1025,-470,30,90,
+        "collide",1250,-490,230,90,
+        "zipline",-290,113,130,620,
+        "fan",710,-35,-440,""
+      ],
+      lvl1: [
+        "map",310,-500,assets.getAssetUrl("levels", "lvl1"),"",
+        "fade",0,-1000,6400,400,
+        "collide",-360,50,160,90,
+        "collide",-160,0,30,90,
+        "collide",600,-390,280,90,
+        "fan",-180,90,-50,"",
+        "flag",700,-340,"",""
+      ],
+      lvl2: [
+        "fan",-170,50,-70,"",
+        "flag",800,380,"",""
+      ],
+      lvl3: [
+        "zipline",550,58,-205,450,
+        "flag",1740,240,"",""
+      ],
+      lvl4: [
+        "fan",-240,90,-70,"",
+        "flag",1400,-380,"",""
+      ],
+      lvl5: [
+        "flag",1240,410,"",""
+      ],
+      lvl6: [
+        "flag",700,500,"",""
+      ],
+      lvl7: [
+        "flag",900,350,"","",
+        "fan",500,0,-200,"",
+        "fan",820,-45,-360,""
+      ],
+      lvl8: [
+        "flag",3000,-700,"",""
+      ]
+    }
+)
+  return __imports__e24534d84ae77363f7ef6a41e3197c0a
+case "./components/assets.osl"
+  class __imports__f8bf9691e38e9ff79b66f4aff978f66b (
+    self.url = "https://raw.githubusercontent.com/Mistium/pencils-edge/main/assets/"
+    
+    self.all = []
+    self.loading = []
+    
+    def register(type, asset, file_type) (
+      void self.getAssetUrl(type, asset, file_type)
+    )
+    
+    def getAssetUrl(type, asset, file_type) (
+        if file_type == "" (
+          file_type = ".png"
+        )
+        local path = self.url ++ type ++ "/" ++ asset ++ file_type
+        if self.all.contains(path).not() (
+          void self.all.append(path)
+          void self.loading.append(path)
+        )
+        return path
+    )
+    
+    def load() (
+      if self.loading.len > 0 (
+        for i self.loading.len (
+          local cur @= self.loading[i]
+          image cur 0 0
+          if cur.imageinfo("loaded") (
+            log "loaded: " ++ cur
+            void self.loading.delete(i)
+            i --
+          )
+        )
+        import "win-buttons"
+        exit
+      )
+    )
+)
+  return __imports__f8bf9691e38e9ff79b66f4aff978f66b
+case "./components/world.osl"
+  class __imports__fb978083d278b910eb6622fdf9267636 (
+    def registerLoader(loader) (
+        self._loader @= loader
+    )
+    
+    def registerCamera(camera) (
+        self._camera @= camera
+    )
+    
+    def registerState(state) (
+        self._state @= state
+    )
+    
+    def pos(x, y) (
+        local cam @= self._camera
+        goto x - cam.x y - cam.y
+    )
+    
+    def render() (
+        local cam @= self._camera
+        local state @= self._state
+        local menu @= state.menu
+        if menu == "main" (
+            cam.goto(0, 0)
+        ) else (
+            cam.x += player.x - cam.x / 10
+            cam.y += (player.y + 100) - cam.y / 10
+            if cam.y < state.levelBoundY (
+                cam.y = state.levelBoundY
+            )
+        )
+        if player.y < state.levelBoundY (
+            state.gotoLevel(state.levelName)
+        )
+        
+        pos(player.x, player.y)
+        local player_x = x_position
+        local player_y = y_position
+        if menu.contains("zipline") (
+            local zipline @= state.zipline
+            player.direction = 100
+            if menu == "ziplinemounted" (
+                player.grounded = true
+                player.collidedWith = -800
+                player.changeVel(zipline.angle.sin() * 5, zipline.angle.cos() * 5 - 0.1)
+                player.applyFriction(0.9)
+                player.x += player.xv
+                player.y += player.yv
+                if zipline.right < player.x (
+                    state.menu = "none"
+                    state.zipline = null
+                    player.grounded = false
+                )
+            ) else (
+                player.goto(zipline.x, zipline.y + 20)
+                state.menu = "ziplinemounted"
+            )
+        ) else (
+            // player.movement()
+        )
+        image player.findCostume() player.stretch * 0.8 60
+        
+        local map @= state.level
+        local i = 1
+        loop map.len / 5 (
+            switch map[i] (
+                case "map"
+                    pos(map[i + 1], map[i + 2])
+                    stretch 300 300
+                    image map[i + 3]
+                    break
+                case "collide"
+                    pos(map[i + 1], map[i + 2])
+                    direction map[i + 4]
+                    local w = map[i + 3]
+                    icon "w 1 square 0 0 " ++ w ++ " 30" 1 : c#f00
+                    local left = (direction + 180).sin() * w + x_position
+                    local right = direction.sin() * w + x_position
+                    local top = (direction + 180).cos() * 30 + y_position
+                    local bottom = direction.cos() * 30 + y_position
+                    if player_x + 30 > left and player_x - 30 < right and player_y < top + 60 and player_y > bottom (
+                if y_position >= player.collidedWith (
+                  player.y = map[i + 2] + 59
+                  player.yv = 0
+                  player.last_grounded = timer
+                  if "arrowup".onKeyDown() (
+                    player.y += 1
+                  )
+                  player.collidedWith @= y_position
+                  // player.grounded = true
+                )
+              )
+              break
+            case "flag"
+              pos(map[i + 1], map[i + 2] + 40)
+              stretch 100 100
+              if dist(x_position, y_position, player_x, player_y) < 100 (
+                state.menu = "Complete"
+              )
+              image assets.getAssetUrl("misc", "flag")
+              break
+            case "fan"
+              direction map[i + 2]
+              pos(map[i + 1] + (direction.sin() * 100), map[i + 3] + (direction.cos() * 100))
+              stretch 80 80
+              image assets.getAssetUrl("fan", round(timer * 3 % 2) + 1)
+              if dist(x_position, y_position, player_x, player_y) < 120 (
+                player.xv = direction.sin() * 50
+                player.yv = direction.cos() * 50
+              )
+              direction 90
+              break
+            case "zipline"
+              pos(map[i + 1], map[i + 3] + 15)
+              stretch 100 100
+              if dist(x_position, y_position, player_x, player_y) < 100 (
+                change_x -43.5
+                image assets.getAssetUrl("zipline", "key")
+                change_x 43.5
+                if "arrowdown".onKeyDown() (
+                  state.menu = "zipline"
+                  state.zipline = {
+                    x: map[i + 1],
+                    y: map[i + 3],
+                    angle: map[i + 2],
+                    right: map[i + 1] + (map[i + 2].sin() * map[i + 4] * 2)
+                  }
+                )
+              ) else (
+                image assets.getAssetUrl("zipline", "pole")
+              )
+              local dir = map[i + 2]
+              local dis = map[i + 4]
+              change dir.sin() * dis dir.cos() * dis + 60
+              direction dir
+              stretch dis 100
+              image assets.getAssetUrl("zipline", "line")
+              direction 90
+              change dir.sin() * dis dir.cos() * dis - 60
+              stretch 100 100
+              image assets.getAssetUrl("zipline", "pole")
+              break
+            case "fade"
+              pos(map[i + 1],map[i + 2])
+              image assets.getAssetUrl("misc", "fade", ".svg") map[i + 3] map[i + 4]
+              break
+          )
+          i += 5
+        )
+        if menu == "ziplinemounted" (
+          player.doStretch()
+        ) else (
+          player.movement()
+        )
+        if state.levelName == "menu" (
+          pos(1150, -100)
+          local x = x_position
+          local num = 0
+          for i 3 (
+            for j 3 (
+              num ++
+              if state.complete < num - 1 (
+                effect "transparency" 50
+                change 30 30
+                image assets.getAssetUrl("misc", "lock")
+                change -30 -30
+              )
+              stretch 80 80
+              local v = 8
+              if dist(x_position, y_position, mouse_x, mouse_y) < 60 and state.complete + 1 >= num (
+                v = random(1,8)
+                if mouse_ondown (
+                  state.gotoLevel("lvl" ++ num)
+                )
+              )
+              image assets.getAssetUrl("selector", v)
+              effect "clear"
+              stretch 70 70
+              image assets.getAssetUrl("text", num)
+              change_x 120
+            )
+            change_y -120
+            set_x x
+          )
+        ) else if menu == "main" (
+          if player.xv > 0 or player.yv > 0 (
+            state.timer = true
+            state.menu = "None"
+            state.timer_start = timestamp
+          )
+        ) else if menu == "complete" (
+          loc 2 2 20 -20
+          text "Press space to return to the menu" 10 : c#000
+          if "space".onKeyDown() (
+            state.gotoLevel("menu")
+          )
+        )
+    )
+)
+  return __imports__fb978083d278b910eb6622fdf9267636
+case "./components/state.osl"
+  class __imports__b9a79e9cb379a05ced25265fea6a11c9 (
+    self._levels = null
+    self.timer = false
+    
+    def loadLevels(levels) (
+      self.menu = "main"
+      self._levels @= levels
+      self.levelName = "menu"
+      self.level @= levels.all.menu
+    )
+    
+    def gotoLevel(name) (
+      self.menu = "main"
+      if levels.all.contains(name) (
+        self.timer = false
+        camera.goto(0, 0)
+        player.goto(-400, 110)
+        player.xv = 0
+        player.yv = 0
+        self.levelName = name
+        self.level @= levels.all[name]
+        self.levelBoundY = self.level[self.level.index("fade") + 2]
+      ) else (
+        throw "error" "no level with that name"
+      )
+    )
+)
+  return __imports__b9a79e9cb379a05ced25265fea6a11c9
+case "./components/loader.osl"
+  class __imports__f9b6b813f14a16b61ee81a5de57d4da0 (
+    self.loading = {
+      is: false
+    }
+    
+    def isLoading() (
+      return self.loading.is
+    )
+    
+    def load() (
+        self.loading.is = true
+    )
+)
+  return __imports__f9b6b813f14a16b61ee81a5de57d4da0
+case "./components/player.osl"
+  class __imports__1eeb9b06a4ad69e1b66a60f8aad5237a (
+    self.x = 0
+    self.y = 0
+    self.xv = 0
+    self.yv = 0
+    self.grounded = false
+    self.last_grounded = timer
+    self.costume = self.findCostume()
+    self.stretch = 100
+    self.direction = 100
+    self.collidedWith = -800
+    
+    def goto(x, y) (
+        self.x = x
+        self.y = y
+    )
+    
+    def getVel() (
+        return [self.xv, self.yv]
+    )
+    
+    def changeVel(x, y) (
+        self.xv += x
+        self.yv += y
+    )
+    
+    def applyFriction(amt) (
+        self.xv *= amt
+        self.yv *= amt
+    )
+    
+    def stepPos() (
+        self.x += self.xv
+        self.y += self.yv
+    )
+    
+    def doStretch() (
+        self.stretch += self.direction - self.stretch / 5
+    )
+    
+    def findCostume() (
+        local yv = self.yv
+        if yv < -10 (
+            return assets.getAssetUrl("player", "7")
+        )
+        if yv < -5 (
+            return assets.getAssetUrl("player", "6")
+        )
+        if yv < -2 (
+            return assets.getAssetUrl("player", "5")
+        )
+        if yv > 7 (
+            return assets.getAssetUrl("player", "4")
+        )
+        if yv > 3 (
+            return assets.getAssetUrl("player", "3")
+        )
+        if yv > 1 (
+            return assets.getAssetUrl("player", "2")
+        )
+        return assets.getAssetUrl("player", "1")
+    )
+    
+    def movement() (
+        self.yv -= 1
+        if self.grounded (
+            self.yv = 0
+            self.last_grounded = timer
+        ) else (
+            self.collidedWith = -800
+        )
+        if "arrowleft".isKeyDown() (
+            self.xv -= 3
+            self.direction = -100
+        )
+        if "arrowright".isKeyDown() (
+            self.xv += 3
+            self.direction = 100
+        )
+        if "arrowup".isKeyDown() and self.yv < 9 and timer - self.last_grounded < 0.1 (
+            self.yv += 20
+            self.grounded = false
+            self.collidedWith = -800
+        )
+        self.x += self.xv
+        self.y += self.yv
+        self.xv *= 0.8
+        if self.yv < -15 (
+            self.yv = -15
+        )
+    
+        self.doStretch()
+    )
+)
+  return __imports__1eeb9b06a4ad69e1b66a60f8aad5237a
+case "./components/camera.osl"
+  class __imports__08613c0979657e5d3dfaf575810831a8 (
+    self.x = 0
+    self.y = 0
+    self.zoom = 1
+    
+    def goto(x, y) (
+        self.x = x
+        self.y = y
+    )
+    
+    def changeX(delta) (
+        self.x += delta
+    )
+    
+    def changeY(delta) (
+        self.y += delta
+    )
+    
+    def change(x, y) (
+        self.x += x
+        self.y += y
+    )
+)
+  return __imports__08613c0979657e5d3dfaf575810831a8)
+)
+camera @= import("./components/camera.osl")
+player @= import("./components/player.osl")
+loader @= import("./components/loader.osl")
+state @= import("./components/state.osl")
+world @= import("./components/world.osl")
+assets @= import("./components/assets.osl")
+levels @= import("./components/levels.osl")
+save @= import("./packages/save.osl")
+
+state.loadLevels(levels)
+
+save.init("pencil@mistium")
+
+data @= save.getItem("data.json")
+if data.exists.not() (
+  save.setItem("data.json", {
+    accessible: 1,
+    speeds: {}
+  })
+  data @= save.getItem("data.json").data
+) else (
+  data @= data.data
+)
+state.speeds @= data.speeds
+state.complete @= data.accessible - 1
+
+assets.register("zipline", "pole")
+assets.register("zipline", "key")
+assets.register("zipline", "line")
+
+assets.register("misc", "lock")
+assets.register("misc", "fade", ".svg")
+assets.register("misc", "flag")
+
+assets.register("levels", "menu")
+log "menu"
+for a 1 (
+  assets.register("levels", "lvl" ++ a)
+)
+for b 7 (
+  assets.register("player", b)
+)
+for c 3 (
+  assets.register("fan", c)
+)
+for d 8 (
+  assets.register("selector", d)
+)
+for e 9 (
+  assets.register("text", e)
+)
+
+def reset() (
+  state.gotoLevel("menu")
+  window.resize(1000, 600)
+)
+
+reset()
+
+world.registerPlayer(player)
+world.registerLoader(loader)
+world.registerCamera(camera)
+world.registerState(state)
+
+window_colour = "#fff"
+window.show()
+window.setDragbox([2,2,0,0],[-2,-2,0,0])
+
+mainloop:
+    assets.load()
+    if loader.isLoading() (
+        loader.draw()
+    ) else (
+        world.render()
+    )
+    // log player
+    import "win-buttons"
