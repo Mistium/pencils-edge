@@ -94,55 +94,55 @@ def render() (
                 pos(map[i + 1], map[i + 2] + 40)
                 stretch 100 100
                 if dist(x_position, y_position, player_x, player_y) < 100 (
-                    
+                    state.menu = "Complete"
                 )
                 image assets.getAssetUrl("misc", "flag")
-                break
-            case "fan"
-                direction map[i + 2]
-                pos(map[i + 1] + (direction.sin() * 100), map[i + 3] + (direction.cos() * 100))
-                stretch 80 80
-                image assets.getAssetUrl("fan", round(timer * 3 % 2) + 1)
-                if dist(x_position, y_position, player_x, player_y) < 120 (
-                    player.xv = direction.sin() * 50
-                    player.yv = direction.cos() * 50
-                )
-                direction 90
-                break
-            case "zipline"
-                pos(map[i + 1], map[i + 3] + 15)
-                stretch 100 100
-                if dist(x_position, y_position, player_x, player_y) < 100 (
-                    change_x -43.5
-                    image assets.getAssetUrl("zipline", "key")
-                    change_x 43.5
-                    if "arrowdown".onKeyDown() (
-                        state.menu = "zipline"
-                        state.zipline = {
-                            x: map[i + 1],
-                            y: map[i + 3],
-                            angle: map[i + 2],
-                            right: map[i + 1] + (map[i + 2].sin() * map[i + 4] * 2)
-                        }
-                    )
-                ) else (
-                    image assets.getAssetUrl("zipline", "pole")
-                )
-                local dir = map[i + 2]
-                local dis = map[i + 4]
-                change dir.sin() * dis dir.cos() * dis + 60
-                direction dir
-                stretch dis 100
-                image assets.getAssetUrl("zipline", "line")
-                direction 90
-                change dir.sin() * dis dir.cos() * dis - 60
-                stretch 100 100
-                image assets.getAssetUrl("zipline", "pole")
-                break
-            case "fade"
-                pos(map[i + 1],map[i + 2])
-                image assets.getAssetUrl("misc", "fade", ".svg") map[i + 3] map[i + 4]
-                break
+                 break
+             case "fan"
+                 direction map[i + 2]
+                 pos(map[i + 1] + (direction.sin() * 100), map[i + 3] + (direction.cos() * 100))
+                 stretch 80 80
+                 image assets.getAssetUrl("fan", round(timer * 3 % 2) + 1)
+                 if dist(x_position, y_position, player_x, player_y) < 120 (
+                     player.xv = direction.sin() * 50
+                     player.yv = direction.cos() * 50
+                 )
+                 direction 90
+                 break
+             case "zipline"
+                 pos(map[i + 1], map[i + 3] + 15)
+                 stretch 100 100
+                 if dist(x_position, y_position, player_x, player_y) < 100 (
+                     change_x -43.5
+                     image assets.getAssetUrl("zipline", "key")
+                     change_x 43.5
+                     if "arrowdown".onKeyDown() (
+                         state.menu = "zipline"
+                         state.zipline = {
+                             x: map[i + 1],
+                             y: map[i + 3],
+                             angle: map[i + 2],
+                             right: map[i + 1] + (map[i + 2].sin() * map[i + 4] * 2)
+                         }
+                     )
+                 ) else (
+                     image assets.getAssetUrl("zipline", "pole")
+                 )
+                 local dir = map[i + 2]
+                 local dis = map[i + 4]
+                 change dir.sin() * dis dir.cos() * dis + 60
+                 direction dir
+                 stretch dis 100
+                 image assets.getAssetUrl("zipline", "line")
+                 direction 90
+                 change dir.sin() * dis dir.cos() * dis - 60
+                 stretch 100 100
+                 image assets.getAssetUrl("zipline", "pole")
+                 break
+             case "fade"
+                 pos(map[i + 1],map[i + 2])
+                 image assets.getAssetUrl("misc", "fade", ".svg") map[i + 3] map[i + 4]
+                 break
         )
         i += 5
     )
@@ -186,6 +186,12 @@ def render() (
             state.timer = true
             state.menu = "None"
             state.timer_start = timestamp
+        )
+    ) else if menu == "complete" (
+        loc 2 2 20 -20
+        text "Press space to return to the menu" 10 : c#000
+        if "space".onKeyDown() (
+            state.gotoLevel("menu")
         )
     )
 )
