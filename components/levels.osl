@@ -1,5 +1,4 @@
 
-
 self.loaded @= []
 
 self.all @= {
@@ -25,6 +24,7 @@ self.all @= {
     "flag",700,-340,"",""
   ],
   lvl2: [
+    "map",310,-500,assets.getAssetUrl("levels", "lvl2"),"",
     "fan",-170,50,-70,"",
     "flag",800,380,"",""
   ],
@@ -51,4 +51,3 @@ self.all @= {
     "flag",3000,-700,"",""
   ]
 }
-

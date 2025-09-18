@@ -9,7 +9,7 @@ def register(type, asset, file_type) (
 )
 
 def getAssetUrl(type, asset, file_type) (
-    if file_type == "" (
+    if file_type == null (
       file_type = ".png"
     )
     local path = self.url ++ type ++ "/" ++ asset ++ file_type
@@ -26,6 +26,7 @@ def load() (
       local cur @= self.loading[i]
       image cur 0 0
       if cur.imageinfo("loaded") (
+        // log "loaded: " ++ cur
         void self.loading.delete(i)
         i --
       )

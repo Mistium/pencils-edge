@@ -189,8 +189,11 @@ def render() (
         )
     ) else if menu == "complete" (
         loc 2 2 20 -20
+        state.timer = false
+        state.time = timestamp - state.timer_start
         text "Press space to return to the menu" 10 : c#000
         if "space".onKeyDown() (
+            levels.complete(state.levelName)
             state.gotoLevel("menu")
         )
     )

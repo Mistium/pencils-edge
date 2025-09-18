@@ -23,3 +23,21 @@ def gotoLevel(name) (
     throw "error" "no level with that name"
   )
 )
+
+def completeLevel() (
+  local n = self.levelName
+  if n == null (
+    return
+  )
+  local data @= save.getItem("data.json")
+  if data.exists (
+    data = data.data
+    if n.endsWith(data.accessible) (
+      data.accessible += 1
+    )
+    if data.speeds[n] == null or data.speeds[n] < self.time (
+      data.speeds[n] = self.time
+    )
+    save.setItem("data.json", data)
+  )
+)

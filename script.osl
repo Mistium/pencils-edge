@@ -10,15 +10,16 @@ save @= import("./packages/save.osl")
 state.loadLevels(levels)
 
 save.init("pencil@mistium")
+
 data @= save.getItem("data.json")
 if data.exists.not() (
-    save.setItem("data.json", {
-        accessible: 1,
-        speeds: {}
-    })
-    data @= save.getItem("data.json").data
+  save.setItem("data.json", {
+    accessible: 1,
+    speeds: {}
+  })
+  data @= save.getItem("data.json").data
 ) else (
-    data @= data.data
+  data @= data.data
 )
 state.speeds @= data.speeds
 state.complete @= data.accessible - 1
@@ -32,25 +33,25 @@ assets.register("misc", "fade", ".svg")
 assets.register("misc", "flag")
 
 assets.register("levels", "menu")
-for a 1 (
-    assets.register("levels", "lvl" ++ a)
+for i 1 (
+  assets.register("levels", "lvl" ++ i)
 )
-for b 7 (
-    assets.register("player", b)
+for i 7 (
+  assets.register("player", i)
 )
-for c 3 (
-    assets.register("fan", c)
+for i 3 (
+  assets.register("fan", i)
 )
-for d 8 (
-    assets.register("selector", d)
+for i 8 (
+  assets.register("selector", i)
 )
-for e 9 (
-    assets.register("text", e)
+for i 9 (
+  assets.register("text", i)
 )
 
 def reset() (
-    state.gotoLevel("menu")
-    window.resize(1000, 600)
+  state.gotoLevel("menu")
+  window.resize(1000, 600)
 )
 
 reset()
