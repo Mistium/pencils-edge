@@ -2,6 +2,10 @@ def registerLoader(loader) (
     self._loader @= loader
 )
 
+def registerPlayer(player) (
+  self._player @= player
+)
+
 def registerCamera(camera) (
     self._camera @= camera
 )
@@ -19,6 +23,7 @@ def render() (
     local cam @= self._camera
     local state @= self._state
     local menu @= state.menu
+    local player @= self._player
     if menu == "main" (
         cam.goto(0, 0)
     ) else (

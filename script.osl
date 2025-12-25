@@ -1,9 +1,9 @@
 camera @= import("./components/camera.osl")
+assets @= import("./components/assets.osl")
 player @= import("./components/player.osl")
 loader @= import("./components/loader.osl")
 state @= import("./components/state.osl")
 world @= import("./components/world.osl")
-assets @= import("./components/assets.osl")
 levels @= import("./components/levels.osl")
 save @= import("./packages/save.osl")
 

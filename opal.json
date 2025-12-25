@@ -1,10 +1,10 @@
 {
-  "name": "pencil's edge",
-  "version": "1.0.0",
-  "description": "a platforming speedrunner game in osl",
-  "main": "script.osl",
-  "dependencies": {
-    "save": "1.0.0"
-  },
-  "tags": []
+    "name": "pencil's edge",
+    "version": "1.0.0",
+    "description": "a platforming speedrunner game in osl",
+    "main": "script.osl",
+    "dependencies": {
+        "save": "1.0.0"
+    },
+    "tags": []
 }
